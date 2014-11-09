@@ -1,4 +1,4 @@
-enigma2binding
+enigma2binding for openHAB
 ==============
 
 Example items:
