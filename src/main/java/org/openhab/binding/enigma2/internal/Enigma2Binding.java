@@ -110,6 +110,9 @@ public class Enigma2Binding extends
 					case CHANNEL:
 						value = node.getChannel();
 						break;
+					case POWERSTATE:
+						value = node.getOnOff();
+						break;
 					default:
 					}
 					if (!bindingConfig.isInbound() && value != null) {
@@ -197,6 +200,9 @@ public class Enigma2Binding extends
 					break;
 				case REMOTE_CONTROL:
 					node.sendRcCommand(command, bindingConfig.getCmdValue());
+					break;
+				case POWERSTATE:
+					node.sendOnOff(command, Enigma2PowerState.STANDBY);
 					break;
 				default:
 					logger.error("Unknown cmdId \"{}\"",

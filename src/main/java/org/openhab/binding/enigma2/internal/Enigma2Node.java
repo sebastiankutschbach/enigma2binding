@@ -31,11 +31,15 @@ public class Enigma2Node {
 
 	private static final String SUFFIX_VOLUME = "/web/vol";
 	private static final String SUFFIX_CHANNEL = "/web/subservices";
+	private static final String SUFFIX_POWERSTATE = "/web/powerstate";
 
 	private String hostName;
 	private String userName;
 	private String password;
 
+	/*
+	 * Getter
+	 */
 	public String getHostName() {
 		return hostName;
 	}
@@ -86,6 +90,22 @@ public class Enigma2Node {
 		}
 	}
 
+	public String getOnOff() {
+		try {
+			String content = HttpUtils.getGetResponse(this.getHostName(),
+					SUFFIX_POWERSTATE, this.getUserName(), this.getPassword());
+			content = XmlUtils.getContentOfElement(content, "e2instandby");
+			return content.equals("true") ? OnOffType.OFF.name() : OnOffType.ON
+					.name();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	/*
+	 * Setter
+	 */
 	public void setVolume(Command command) {
 		if (command instanceof IncreaseDecreaseType) {
 			sendRcCommand(
@@ -119,6 +139,20 @@ public class Enigma2Node {
 	public void sendMuteUnmute(Command command) {
 		if (command instanceof OnOffType) {
 			sendRcCommand(command, RC_MUTE_UNMUTE);
+		} else {
+			logger.error("Unsupported command type");
+		}
+	}
+
+	public void sendOnOff(Command command, Enigma2PowerState powerState) {
+		if (command instanceof OnOffType) {
+			try {
+				HttpUtils.getGetResponse(hostName, SUFFIX_POWERSTATE
+						+ "?newstate=" + powerState.getValue(), userName,
+						password);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		} else {
 			logger.error("Unsupported command type");
 		}
